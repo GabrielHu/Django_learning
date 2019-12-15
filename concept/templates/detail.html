@@ -1,0 +1,8 @@
+<p> {{ object.title}} </p>
+<div>
+    <img src="/{{ object.image }}" width=200 height=200>
+    <div>
+        <a href="{% url 'edit' object.id%}">Edit</a>
+        <a href="{% url 'delete' object.id%}">Delete</a>
+    </div>
+</div>
