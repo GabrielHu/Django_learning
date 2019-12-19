@@ -7,4 +7,5 @@ from .models import Member
 class MemberCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = Member
-        fields = ('username', 'email', 'profile_pic')
+        fields = ('username', 'first_name',
+                  'last_name', 'email', 'profile_pic')
