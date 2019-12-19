@@ -50,13 +50,13 @@ class SignUp(CreateView):
 
 class UserProfile(LoginRequiredMixin, DetailView):
     model = Member
-    template_name = 'user_profile.html'
+    template_name = 'profile.html'
     login_url = 'login'
 
 
 class EditProfile(LoginRequiredMixin, UpdateView):
     model = Member
-    template_name = 'edit_profile.html'
+    template_name = 'profileedit.html'
     fields = ['profile_pic', 'username']
     login_url = 'login'
 
