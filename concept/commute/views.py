@@ -45,3 +45,9 @@ class SignUp(CreateView):
     form_class = MemberCreationForm
     success_url = reverse_lazy('login')
     template_name = 'signup.html'
+
+
+# class ProfileEdit(UpdateView):
+#     form_class = MemberCreationForm
+#     success_url = reverse_lazy('login')
+#     template_name = 'profileedit.html'

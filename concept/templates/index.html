@@ -1,25 +1,7 @@
-{% load static %}
 
-<ul>
-    {% if request.user.is_authenticated %}
-        <li>
-            <p> Hi, {{request.user.username}}</p>
-        </li>
-        <li>
-            <a href="{% url 'logout' %}">Logout</a>
-        </li>
-    {% else %}
-        <li>
-            <a href="{% url 'login' %}">Login</a>
-        </li>
-        <li>
-            <a href="{% url 'signup' %}">Signup</a>
-        </li>
-    {% endif %}
+{% extends 'base.html' %}
 
-
-</ul>
-
+{% block content %}
 <div>
     <a href= "{% url 'create' %}"> Make Post </a>
 </div>
@@ -31,3 +13,4 @@
         </a>
     {% endfor %}
 </div>
+{% endblock content%}

@@ -19,9 +19,5 @@ class Post(models.Model):
 
 
 class Member(AbstractUser):
-    # first_name = forms.CharField(forms.TextInput(
-    #     attrs={'class': 'form-control', 'placeholder': 'First Name'}), max_length=32, help_text='First name')
-    # last_name = forms.CharField(forms.TextInput(
-    #     attrs={'class': 'form-control', 'placeholder': 'Last Name'}), max_length=32, help_text='Last name')
     profile_pic = ProcessedImageField(upload_to='static/images/profiles',
                                       format='JPEG', options={'quality': 100}, blank=True, null=True)
