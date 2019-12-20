@@ -1,6 +1,23 @@
-<h2> Profile Edit </h2>
-<form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{form.as_p}}
-    <button type="submit">Update</button>
-</form>
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row profile-settings">
+  <div class="col-xs-12">
+    <div class="profile-pic-name">
+      {% if user.profile_pic %}
+        <img class="picture-circle--medium" src="/{{user.profile_pic}}">
+      {% endif %}
+      {% comment %} <span class="username">{{ user.username }}</span> {% endcomment %}
+      <span class="first_name">{{ user.first_name }}</span>
+      {% comment %} <span class="last_name">{{ user.last_name }}</span> {% endcomment %}
+    </div>
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Update" />
+    </form>
+  </div>
+</div>
+
+{% endblock content %}

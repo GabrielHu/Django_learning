@@ -10,6 +10,18 @@ class Member(AbstractUser):
     profile_pic = ProcessedImageField(upload_to='static/images/profiles',
                                       format='JPEG', options={'quality': 100}, blank=True, null=True)
 
+    def get_connections(self):
+        connections = UserConnection.objects.filter(creator=self)
+        return connections
+
+    def get_followers(self):
+        followers = UserConnection.objects.filter(following=self)
+        return followers
+
+    def is_followed_by(self, user):
+        followers = UserConnection.objects.filter(following=self)
+        return followers.filter(creator=user).exists()
+
 
 class Post(models.Model):
     author = models.ForeignKey(
@@ -48,10 +60,28 @@ class Like(models.Model):
 
 class Comment(models.Model):
     post = models.ForeignKey(
-        Post, on_delete=models.CASCADE, related_name='comments',)
-    user = models.ForeignKey(Member, on_delete=models.CASCADE)
+        Post, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(
+        Member, on_delete=models.CASCADE, related_name='comments')
     comment = models.CharField(max_length=1000)
     posted_on = models.DateTimeField(auto_now_add=True, editable=False)
 
     def __str__(self):
         return self.comment
+
+
+class UserConnection(models.Model):
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    creator = models.ForeignKey(
+        Member,
+        on_delete=models.CASCADE,
+        related_name="friendship_creator_set"
+    )
+    following = models.ForeignKey(
+        Member,
+        on_delete=models.CASCADE,
+        related_name="friend_set"
+    )
+
+    def __str__(self):
+        return self.creator.first_name + ' follows ' + self.following.first_name

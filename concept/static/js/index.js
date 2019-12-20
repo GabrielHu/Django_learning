@@ -84,7 +84,7 @@ function create_comment(success_cb, error_cb) {
 
   $.ajax({
     type: "POST",
-    url: '/comment',
+    url: '/commute/comment',
     data: {
       comment_text: comment_text,
       post_pk: post_pk
@@ -125,7 +125,7 @@ function follow_user(success_cb, error_cb, type) {
 
   $.ajax({
     type: "POST",
-    url: '/togglefollow',
+    url: '/commute/togglefollow',
     data: {
       follow_user_pk: follow_user_pk,
       type: type

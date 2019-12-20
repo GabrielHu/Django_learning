@@ -1,8 +1,9 @@
 from django.shortcuts import render
+from django.contrib import admin
 from django.views.generic import TemplateView, ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import Post, Member, Like, Comment
+from .models import Post, Member, Like, Comment, UserConnection
 
 from .forms import MemberCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -18,11 +19,26 @@ class PostListView(LoginRequiredMixin, ListView):
     model = Post
     template_name = "index.html"
 
+    def get_queryset(self):
+        current_user = self.request.user
+        following = set()
+        for conn in UserConnection.objects.filter(creator=current_user).select_related('following'):
+            following.add(conn.following)
+        return Post.objects.filter(author__in=following)
 
 class PostDetailView(DetailView):
     model = Post
     template_name = "detail.html"
 
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        liked = Like.objects.filter(post=self.kwargs.get(
+            'pk'), user=self.request.user).first()
+        if liked:
+            data['liked'] = 1
+        else:
+            data['liked'] = 0
+        return data
 
 class PostCreateView(CreateView):
     model = Post
@@ -57,8 +73,32 @@ class UserProfile(LoginRequiredMixin, DetailView):
 class EditProfile(LoginRequiredMixin, UpdateView):
     model = Member
     template_name = 'profileedit.html'
-    fields = ['profile_pic', 'username']
+    fields = ['profile_pic', 'username', 'first_name', 'last_name']
     login_url = 'login'
+    success_url = reverse_lazy('posts')
+
+
+class ExploreView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'explore.html'
+    login_url = 'login'
+
+    def get_queryset(self):
+        return Post.objects.all()[:20:-1]
+
+
+class FollowingInline(admin.StackedInline):
+    model = UserConnection
+    fk_name = 'creator'
+
+
+class FollowerInline(admin.StackedInline):
+    model = UserConnection
+    fk_name = 'following'
+
+
+class UserAdmin(admin.ModelAdmin):
+    inlines = [FollowerInline, FollowingInline]
 
 
 @ajax_request
@@ -107,4 +147,32 @@ def addComment(request):
         'result': result,
         'post_pk': post_pk,
         'commenter_info': commenter_info
+    }
+
+
+@ajax_request
+def toggleFollow(request):
+    current_user = Member.objects.get(pk=request.user.pk)
+    follow_user_pk = request.POST.get('follow_user_pk')
+    follow_user = Member.objects.get(pk=follow_user_pk)
+    try:
+        if current_user != follow_user:
+            if request.POST.get('type') == 'follow':
+                connection = UserConnection(
+                    creator=current_user, following=follow_user)
+                connection.save()
+            elif request.POST.get('type') == 'unfollow':
+                UserConnection.objects.filter(
+                    creator=current_user, following=follow_user).delete()
+            result = 1
+        else:
+            result = 0
+    except Exception as e:
+        print('++++++',e)
+        result = 0
+
+    return {
+        'result': result,
+        'type': request.POST.get('type'),
+        'follow_user_pk': follow_user_pk
     }
